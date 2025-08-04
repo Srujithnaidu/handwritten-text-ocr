@@ -4,39 +4,74 @@ from PIL import Image
 import numpy as np
 import cv2
 
-# Initialize EasyOCR reader
-reader = easyocr.Reader(['en'])
+reader = easyocr.Reader(['en'], gpu=False)
 
 st.set_page_config(page_title="Handwritten Text OCR", layout="centered")
 st.title("✍️ Handwritten Text Recognition using EasyOCR")
-st.write("Upload a handwritten sentence image. The app will extract the text and let you download it.")
+st.write("Upload a handwritten sentence image. The app will extract the exact text and let you download it.")
 
 uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
-
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess
-    np_image = np.array(image)
-    gray = cv2.cvtColor(np_image, cv2.COLOR_RGB2GRAY)
+    np_img = np.array(image)
+    gray = cv2.cvtColor(np_img, cv2.COLOR_RGB2GRAY)
     st.image(gray, caption="Grayscale Image", use_column_width=True, clamp=True)
 
-    # OCR
-    with st.spinner("🔍 Recognizing handwritten text..."):
-        result = reader.readtext(gray, detail=0, paragraph=True)
+    with st.spinner("🔍 Extracting text..."):
+        recognized = reader.readtext(gray, detail=0, paragraph=True)
 
-    extracted_text = "\n".join(result)
+    extracted_text = "\n".join(recognized)
     st.subheader("📝 Extracted Text")
     st.success(extracted_text)
 
-    # Download text file
     st.download_button(
         label="📥 Download Text",
         data=extracted_text,
         file_name="recognized_text.txt",
         mime="text/plain"
     )
+
+# import streamlit as st
+# import easyocr
+# from PIL import Image
+# import numpy as np
+# import cv2
+
+# # Initialize EasyOCR reader
+# reader = easyocr.Reader(['en'])
+
+# st.set_page_config(page_title="Handwritten Text OCR", layout="centered")
+# st.title("✍️ Handwritten Text Recognition using EasyOCR")
+# st.write("Upload a handwritten sentence image. The app will extract the text and let you download it.")
+
+# uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
+
+# if uploaded_file:
+#     image = Image.open(uploaded_file).convert("RGB")
+#     st.image(image, caption="Uploaded Image", use_column_width=True)
+
+#     # Preprocess
+#     np_image = np.array(image)
+#     gray = cv2.cvtColor(np_image, cv2.COLOR_RGB2GRAY)
+#     st.image(gray, caption="Grayscale Image", use_column_width=True, clamp=True)
+
+#     # OCR
+#     with st.spinner("🔍 Recognizing handwritten text..."):
+#         result = reader.readtext(gray, detail=0, paragraph=True)
+
+#     extracted_text = "\n".join(result)
+#     st.subheader("📝 Extracted Text")
+#     st.success(extracted_text)
+
+#     # Download text file
+#     st.download_button(
+#         label="📥 Download Text",
+#         data=extracted_text,
+#         file_name="recognized_text.txt",
+#         mime="text/plain"
+#     )
 
 # import streamlit as st
 # import easyocr
